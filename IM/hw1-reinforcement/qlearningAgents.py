@@ -201,19 +201,13 @@ class ApproximateQAgent(PacmanQAgent):
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
-        weights = self.getWeights()
         features = self.featExtractor.getFeatures(state, action)
-        q = {}
-        bestAction = 0
-        for legal_action in self.getLegalActions(nextState):
-            q[legal_action] = self.getQValue(nextState, legal_action)
-            bestAction = max(q.iteritems(), key=operator.itemgetter(1))[1]
+        learnedValue = (reward+self.discount*self.computeValueFromQValues(nextState))
+        oldValue = self.getQValue(state, action)
 
-        for i in features:
-            if weights[i]:
-                weights[i] += self.alpha*(reward+self.discount*bestAction-self.getQValue(state, action))*features[i]
-            else:
-                weights[i] = self.alpha*(reward+self.discount*bestAction-self.getQValue(state, action))*features[i]
+        for feature in features.keys():
+                self.weights[feature] += self.alpha*(learnedValue-oldValue)*features[feature]
+        return
 
 
 
@@ -226,5 +220,4 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # you might want to print your weights here for debugging
             "*** YOUR CODE HERE ***"
-            print (self.getWeights())
             pass
